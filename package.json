@@ -1,0 +1,36 @@
+{
+  "name": "e-wallet",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "NODE_ENV=production node server",
+    "dev": "nodemon server"
+  },
+  "author": "wastech",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "colors": "^1.4.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-fileupload": "^1.4.0",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^6.7.0",
+    "helmet": "^6.0.1",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.0",
+    "morgan": "^1.10.0",
+    "node-geocoder": "^4.2.0",
+    "nodemailer": "^6.9.1",
+    "randomatic": "^3.1.1",
+    "slugify": "^1.6.5",
+    "xss-clean": "^0.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.21"
+  }
+}
