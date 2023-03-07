@@ -33,17 +33,6 @@ exports.GetAllPosts = asyncHandler(async (req, res, next) => {
 // @route     GET /api/v1/posts/:id
 // @access    Public
 exports.getPost = asyncHandler(async (req, res, next) => {
-  // const post = await Post.findOneAndUpdate(
-  //     { _id: req.params.id },
-  //     { $inc: { views: 1 } },
-  //     { new: true }
-  //   );;
-
-  // if (!post) {
-  //   return next(
-  //     new ErrorResponse(`Post not found with id of ${req.params.id}`, 404)
-  //   );
-  // }
 
   const post = await Post.findById(req.params.id);
   if (!post) {
@@ -115,6 +104,7 @@ exports.upVote = async (req, res, next) => {
   }
 };
 
+
 exports.downVote = asyncHandler(async (req, res, next) => {
   try {
     const question = await Post.findById(req.params.id);
@@ -143,4 +133,36 @@ exports.downVote = asyncHandler(async (req, res, next) => {
     console.log(err);
     res.status(500).json({ message: "Something went wrong" });
   }
+});
+
+
+// @desc      Delete Post
+// @route     DELETE /api/v1/posts/:id
+// @access    Private
+exports.deletePost = asyncHandler(async (req, res, next) => {
+  const post = await Post.findById(req.params.id);
+  console.log('this is post', post)
+
+  if (!post) {
+    return next(
+      new ErrorResponse(`No post with the id of ${req.params.id}`, 404)
+    );
+  }
+
+  // Make sure user is post owner
+  if (post.author.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to delete post ${post._id}`,
+        401
+      )
+    );
+  }
+
+  await post.deleteOne();
+
+  res.status(200).json({
+    success: true,
+    data: {}
+  });
 });

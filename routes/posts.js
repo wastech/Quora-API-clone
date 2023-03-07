@@ -5,9 +5,9 @@ const {
   addPost,
   getTimeline,
   upVote,
-  downVote
+  downVote,
   //   updateCourse,
-  //   deleteCourse
+  deletePost
 } = require("../controllers/post");
 
 const Post = require("../models/Post");
@@ -24,9 +24,10 @@ router
 
 router.route("/timeline").get(protect, authorize("user", "admin"), getTimeline);
 
-router.route("/:id").get(getPost);
+router.route("/:id").get(getPost)
+.delete(protect, authorize('user', 'admin'), deletePost);
 //   .put(protect, authorize('publisher', 'admin'), updateCourse)
-//   .delete(protect, authorize('publisher', 'admin'), deleteCourse);
+ 
 
 router.route("/:id/upvote").put(protect, authorize("user", "admin"), upVote);
 
