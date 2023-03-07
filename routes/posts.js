@@ -4,7 +4,8 @@ const {
   getPost,
   addPost,
   getTimeline,
-  sharePost,
+  upVote,
+  downVote
   //   updateCourse,
   //   deleteCourse
 } = require("../controllers/post");
@@ -26,5 +27,9 @@ router.route("/timeline").get(protect, authorize("user", "admin"), getTimeline);
 router.route("/:id").get(getPost);
 //   .put(protect, authorize('publisher', 'admin'), updateCourse)
 //   .delete(protect, authorize('publisher', 'admin'), deleteCourse);
+
+router.route("/:id/upvote").put(protect, authorize("user", "admin"), upVote);
+
+router.route("/:id/downvote").put(protect, authorize("user", "admin"), downVote);
 
 module.exports = router;

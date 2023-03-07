@@ -1,6 +1,7 @@
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const Post = require("../models/Post");
+const User = require("../models/User");
 
 const VIEW_TIMEOUT_MS = 300000; // 5 minutes
 
@@ -84,3 +85,62 @@ exports.getTimeline = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: posts });
 });
 
+exports.upVote = async (req, res, next) => {
+  try {
+    const question = await Post.findById(req.params.id);
+    if (!question) {
+      return next(
+        new ErrorResponse(`Post not found with id of ${req.params.id}`, 404)
+      );
+    }
+    const user = await User.findById(req.user._id);
+    // Check if the user has already upvoted the question
+    if (question.upvotes.includes(user._id)) {
+      return res
+        .status(400)
+        .json({ message: "You have already upvoted this question" });
+    }
+
+    // Check if the user has already downvoted the question
+    if (question.downvotes.includes(user._id)) {
+      question.downvotes.pull(user._id);
+    }
+
+    question.upvotes.push(user._id);
+    await question.save();
+    res.status(200).json({ message: "Question upvoted successfully" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+exports.downVote = asyncHandler(async (req, res, next) => {
+  try {
+    const question = await Post.findById(req.params.id);
+    if (!question) {
+      return next(
+        new ErrorResponse(`Post not found with id of ${req.params.id}`, 404)
+      );
+    }
+    const user = await User.findById(req.user._id);
+    // Check if the user has already downvotes the question
+    if (question.downvotes.includes(user._id)) {
+      return res
+        .status(400)
+        .json({ message: "You have already downvotes this question" });
+    }
+
+    // Check if the user has already upvotes the question
+    if (question.upvotes.includes(user._id)) {
+      question.upvotes.pull(user._id);
+    }
+
+    question.downvotes.push(user._id);
+    await question.save();
+    res.status(200).json({ message: "Question downvotes successfully" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+});
