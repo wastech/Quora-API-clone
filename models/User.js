@@ -18,8 +18,8 @@ const UserSchema = new mongoose.Schema({
   avatar: {
     type: String,
   },
-  followers: [{ type: mongoose.ObjectId, ref: "User" }],
-  following: [{ type: mongoose.ObjectId, ref: "User" }],
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 
   phone: {
     type: String,
