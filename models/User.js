@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const randomize = require("randomatic");
+var gravatar = require("gravatar");
 
 const UserSchema = new mongoose.Schema({
   first_name: {
@@ -14,31 +15,53 @@ const UserSchema = new mongoose.Schema({
     required: [true, "Please add a last_name"],
   },
 
-  business_name: {
+  avatar: {
     type: String,
-    required: [true, "Please add a business_name"],
   },
-  merchant_type: {
+  followers: [{ type: mongoose.ObjectId, ref: "User" }],
+  following: [{ type: mongoose.ObjectId, ref: "User" }],
+
+  phone: {
     type: String,
-    required: [true, "Please add a merchant_type"],
-    default: "Individual",
-  },
-  phone_number: {
-    type: Number,
-    minLength: [10, "no should have minimum 10 digits"],
-    maxLength: [10, "no should have maximum 10 digits"],
-    match: /^(\()?\d{3}(\))?(-|\s)?\d{3}(-|\s)\d{4}$/,
-    required: [true, "Please add a name"],
+    validate: {
+      validator: function (v) {
+        // Phone number format validation
+        return /^\+?\d{1,3}[- ]?\d{3}[- ]?\d{3}[- ]?\d{4}$/.test(v);
+      },
+      message: (props) => `${props.value} is not a valid phone number`,
+    },
   },
 
   email: {
     type: String,
-    required: [true, "Please add an email"],
     unique: true,
-    match: [
-      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-      "Please add a valid email",
-    ],
+    required: true,
+    validate: {
+      validator: function (v) {
+        // Email format validation
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      },
+      message: (props) => `${props.value} is not a valid email address`,
+    },
+  },
+
+  // email: {
+  //   type: String,
+  //   required: [true, "Please add an email"],
+  //   unique: true,
+  //   match: [
+  //     /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+  //     "Please add a valid email",
+  //   ],
+  // },
+  bio: {
+    type: String,
+    validate: {
+      validator: function (v) {
+        return v.length >= 10;
+      },
+      message: (props) => `Bio must not exceed 10 characters`,
+    },
   },
   country: {
     type: String,
@@ -50,11 +73,19 @@ const UserSchema = new mongoose.Schema({
     enum: ["user", "admin"],
     default: "user",
   },
+
   password: {
     type: String,
-    required: [true, "Please add a password"],
-    minlength: 6,
+    required: true,
     select: false,
+    validate: {
+      validator: function (v) {
+        // Password validation
+        return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm.test(v);
+      },
+      message: (props) =>
+        `${props.value} is not a valid password. A valid password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number`,
+    },
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
@@ -73,6 +104,53 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+});
+
+UserSchema.path("followers").validate(function (followers) {
+  const userId = this._id;
+  return new Promise((resolve, reject) => {
+    if (followers.length === 0) {
+      return resolve(true); // Allow empty followers array
+    }
+
+    // Check if all followers are valid user IDs
+    User.find(
+      {
+        _id: {
+          $in: followers,
+        },
+      },
+      function (err, users) {
+        if (err) {
+          return reject(err);
+        }
+
+        const isValid = users.every(
+          (user) => user._id.toString() !== userId.toString()
+        );
+
+        if (!isValid) {
+          return reject(
+            new Error("One or more invalid user IDs in followers array")
+          );
+        }
+
+        return resolve(true);
+      }
+    );
+  });
+});
+
+UserSchema.pre("save", function (next) {
+  if (!this.avatar) {
+    const avatarUrl = gravatar.url(
+      this.email,
+      { s: "200", r: "pg", d: "mp" },
+      true
+    );
+    this.avatar = avatarUrl;
+  }
+  next();
 });
 
 // Encrypt password using bcrypt

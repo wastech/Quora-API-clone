@@ -10,30 +10,28 @@ const User = require("../models/User");
 exports.register = asyncHandler(async (req, res, next) => {
   const {
     first_name,
-    phone_number,
-    business_name,
+    phone,
     country,
     last_name,
     email,
     password,
-    merchant_type,
     role,
   } = req.body;
+  
 
   const userExists = await User.findOne({ email });
 
   if (userExists) {
     res.status(400);
-    throw new Error("User already exists");
+    throw new Error(`User with email ${email} exists`);
   }
   // Create user
   const user = await User.create({
     first_name,
     last_name,
+    phone,
     country,
-    business_name,
-    phone_number,
-    merchant_type,
+   
     email,
     password,
     role,
@@ -121,12 +119,11 @@ exports.getMe = asyncHandler(async (req, res, next) => {
 exports.updateDetails = asyncHandler(async (req, res, next) => {
   const fieldsToUpdate = {
     first_name: req.body.first_name,
-    phone_number: req.body.phone_number,
-    business_name: req.body.business_name,
+    phone: req.body.phone,
+    bio: req.body.bio,
     country: req.body.country,
     last_name: req.body.last_name,
     email: req.body.email,
-    merchant_type: req.body.merchant_type,
   };
 
   const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
