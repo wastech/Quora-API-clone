@@ -1,4 +1,3 @@
-const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const Message = require("../models/Message");
 
@@ -23,15 +22,12 @@ exports.getMessage = asyncHandler(async (req, res, next) => {
   const userId = req.user._id;
   const { recipientId } = req.query;
 
-  console.log('this is user Id', userId)
-  console.log('this is recipientId', recipientId)
-
   const messages = await Message.find({
     $or: [
       { sender: userId, recipient: recipientId },
       { sender: recipientId, recipient: userId },
     ],
-  }).populate("sender recipient" , 'first_name last_name');
+  }).populate("sender recipient", "first_name last_name");
   res.status(201).json({
     success: true,
     data: messages,
