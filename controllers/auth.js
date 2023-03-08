@@ -8,16 +8,8 @@ const User = require("../models/User");
 // @route     POST /api/v1/auth/register
 // @access    Public
 exports.register = asyncHandler(async (req, res, next) => {
-  const {
-    first_name,
-    phone,
-    country,
-    last_name,
-    email,
-    password,
-    role,
-  } = req.body;
-  
+  const { first_name, phone, country, last_name, email, password, role } =
+    req.body;
 
   const userExists = await User.findOne({ email });
 
@@ -31,7 +23,7 @@ exports.register = asyncHandler(async (req, res, next) => {
     last_name,
     phone,
     country,
-   
+
     email,
     password,
     role,
@@ -124,6 +116,7 @@ exports.updateDetails = asyncHandler(async (req, res, next) => {
     country: req.body.country,
     last_name: req.body.last_name,
     email: req.body.email,
+    role: req.body.role,
   };
 
   const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
@@ -283,4 +276,100 @@ const sendTokenResponse = (user, statusCode, res) => {
     success: true,
     token,
   });
+};
+
+exports.follow = async (req, res, next) => {
+  // grab token from email
+  const userId = req.params.userId;
+  const currentUser = req.user; //
+
+  if (currentUser._id.equals(userId)) {
+    return res.status(400).json({ message: 'You cannot follow yourself.' });
+  }
+
+  if (currentUser.following.includes(userId)) {
+    return res
+      .status(400)
+      .json({ message: "You are already following this user." });
+  }
+
+  try {
+    await User.updateOne(
+      { _id: currentUser._id },
+      { $push: { following: userId } }
+    );
+    await User.updateOne(
+      { _id: userId },
+      { $push: { followers: currentUser._id } }
+    );
+    return res.json({ message: "You are now following this user." });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred while following this user." });
+  }
+};
+
+exports.unfollow = async (req, res, next) => {
+   // grab token from email
+   const userId = req.params.userId;
+   const currentUser = req.user; //
+
+   if (currentUser._id.equals(userId)) {
+    return res.status(400).json({ message: 'You cannot unfollow yourself.' });
+  }
+
+
+  if (!currentUser.following.includes(userId)) {
+    return res.status(400).json({ message: 'You are not following this user.' });
+  }
+
+  try {
+    await User.updateOne(
+      { _id: currentUser._id },
+      { $pull: { following: userId } }
+    );
+    await User.updateOne(
+      { _id: userId },
+      { $pull: { followers: currentUser._id } }
+    );
+    return res.json({ message: 'You have unfollowed this user.' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'An error occurred while unfollowing this user.' });
+  }
+};
+
+
+exports.followers = async (req, res, next) => {
+
+  const userId = req.params.userId;
+
+  try {
+    // Find the user with the specified ID and populate their followers list
+    const user = await User.findById(userId).populate('followers');
+    res.status(200).json(user.followers);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+  // grab token from email
+ 
+};
+
+
+exports.following = async (req, res, next) => {
+
+  const userId = req.params.userId;
+
+  try {
+    // Find the user with the specified ID and populate their following list
+    const user = await User.findById(userId).populate('following');
+    res.status(200).json(user.following);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+ 
 };
