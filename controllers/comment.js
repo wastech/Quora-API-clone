@@ -1,11 +1,11 @@
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
-const Message = require("../models/Message");
+const Comment = require("../models/Comment");
 
 exports.addComment = asyncHandler(async (req, res, next) => {
   const { text, post } = req.body;
 
-  const comment = new Message({
+  const comment = new Comment({
     user: req.user._id,
     text: text,
     post: post,
@@ -48,6 +48,8 @@ exports.updateComment = asyncHandler(async (req, res, next) => {
       runValidators: true,
     }
   );
+
+  console.log("this is comment", comment);
 
   res.status(200).json({
     success: true,
