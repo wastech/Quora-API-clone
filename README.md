@@ -70,7 +70,8 @@ Install nodemon globally
 ``` yarn dev ```
 
 # Images
+![Screenshot 2023-03-10 184847](https://user-images.githubusercontent.com/56930241/224388916-a62c9330-e881-4096-b95f-e4b755f64fa3.png)
+![Screenshot 2023-03-10 184920](https://user-images.githubusercontent.com/56930241/224388876-aa48f534-a55a-4942-b956-93ce6c19eb50.png)
 
-![Uploading Screenshot 2023-03-10 184920.png…]()
-![Uploading Screenshot 2023-03-10 184847.png…]()
+
 
