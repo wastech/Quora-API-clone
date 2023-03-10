@@ -18,7 +18,7 @@
 - Admin functionality: Enable app administrators to manage user accounts, content, and settings, and to enforce community guidelines.
 
 # API Documentation
-> Hosted on Render
+> Hosted on Render [click here] (https://documenter.getpostman.com/view/9340802/2s93Jrv4Ut)
 
 # Requirement
  - [Nodejs](https://nodejs.org/en/)
@@ -71,6 +71,8 @@ Install nodemon globally
 
 # Images
 ![Screenshot 2023-03-10 184847](https://user-images.githubusercontent.com/56930241/224388916-a62c9330-e881-4096-b95f-e4b755f64fa3.png)
+
+
 ![Screenshot 2023-03-10 184920](https://user-images.githubusercontent.com/56930241/224388876-aa48f534-a55a-4942-b956-93ce6c19eb50.png)
 
 
