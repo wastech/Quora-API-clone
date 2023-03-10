@@ -23,7 +23,6 @@ exports.register = asyncHandler(async (req, res, next) => {
     last_name,
     phone,
     country,
-
     email,
     password,
     role,
@@ -284,7 +283,7 @@ exports.follow = async (req, res, next) => {
   const currentUser = req.user; //
 
   if (currentUser._id.equals(userId)) {
-    return res.status(400).json({ message: 'You cannot follow yourself.' });
+    return res.status(400).json({ message: "You cannot follow yourself." });
   }
 
   if (currentUser.following.includes(userId)) {
@@ -312,17 +311,18 @@ exports.follow = async (req, res, next) => {
 };
 
 exports.unfollow = async (req, res, next) => {
-   // grab token from email
-   const userId = req.params.userId;
-   const currentUser = req.user; //
+  // grab token from email
+  const userId = req.params.userId;
+  const currentUser = req.user; //
 
-   if (currentUser._id.equals(userId)) {
-    return res.status(400).json({ message: 'You cannot unfollow yourself.' });
+  if (currentUser._id.equals(userId)) {
+    return res.status(400).json({ message: "You cannot unfollow yourself." });
   }
 
-
   if (!currentUser.following.includes(userId)) {
-    return res.status(400).json({ message: 'You are not following this user.' });
+    return res
+      .status(400)
+      .json({ message: "You are not following this user." });
   }
 
   try {
@@ -334,42 +334,38 @@ exports.unfollow = async (req, res, next) => {
       { _id: userId },
       { $pull: { followers: currentUser._id } }
     );
-    return res.json({ message: 'You have unfollowed this user.' });
+    return res.json({ message: "You have unfollowed this user." });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'An error occurred while unfollowing this user.' });
+    return res
+      .status(500)
+      .json({ message: "An error occurred while unfollowing this user." });
   }
 };
 
-
 exports.followers = async (req, res, next) => {
-
   const userId = req.params.userId;
 
   try {
     // Find the user with the specified ID and populate their followers list
-    const user = await User.findById(userId).populate('followers');
+    const user = await User.findById(userId).populate("followers");
     res.status(200).json(user.followers);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: "Internal server error" });
   }
   // grab token from email
- 
 };
 
-
 exports.following = async (req, res, next) => {
-
   const userId = req.params.userId;
 
   try {
     // Find the user with the specified ID and populate their following list
-    const user = await User.findById(userId).populate('following');
+    const user = await User.findById(userId).populate("following");
     res.status(200).json(user.following);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: "Internal server error" });
   }
- 
 };

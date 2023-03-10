@@ -1,33 +1,32 @@
-const path = require('path');
-const express = require('express');
-const dotenv = require('dotenv');
-const morgan = require('morgan');
-const colors = require('colors');
-const fileupload = require('express-fileupload');
-const cookieParser = require('cookie-parser');
-const mongoSanitize = require('express-mongo-sanitize');
-const helmet = require('helmet');
-const xss = require('xss-clean');
-const rateLimit = require('express-rate-limit');
-const hpp = require('hpp');
-const cors = require('cors');
-const errorHandler = require('./middleware/error');
-const connectDB = require('./config/db');
+const path = require("path");
+const express = require("express");
+const dotenv = require("dotenv");
+const morgan = require("morgan");
+const colors = require("colors");
+const fileupload = require("express-fileupload");
+const cookieParser = require("cookie-parser");
+const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
+const xss = require("xss-clean");
+const rateLimit = require("express-rate-limit");
+const hpp = require("hpp");
+const cors = require("cors");
+const errorHandler = require("./middleware/error");
+const connectDB = require("./config/db");
 
 // Load env vars
-dotenv.config({ path: './config/config.env' });
+dotenv.config({ path: "./config/config.env" });
 
 // Connect to database
 connectDB();
 
 // Route files
 
-const auth = require('./routes/auth');
-const users = require('./routes/users');
-const posts = require('./routes/posts');
-const messages = require('./routes/messages');
-const comments = require('./routes/comments');
-
+const auth = require("./routes/auth");
+const users = require("./routes/users");
+const posts = require("./routes/posts");
+const messages = require("./routes/messages");
+const comments = require("./routes/comments");
 
 const app = express();
 
@@ -38,8 +37,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Dev logging middleware
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
 }
 
 // File uploading
@@ -57,7 +56,7 @@ app.use(xss());
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 10 mins
-  max: 100
+  max: 100,
 });
 app.use(limiter);
 
@@ -68,16 +67,15 @@ app.use(hpp());
 app.use(cors());
 
 // Set static folder
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
 // Mount routers
 
-app.use('/api/v1/auth', auth);
-app.use('/api/v1/users', users);
-app.use('/api/v1/posts', posts);
-app.use('/api/v1/messages', messages);
-app.use('/api/v1/comments', comments);
-
+app.use("/api/v1/auth", auth);
+app.use("/api/v1/users", users);
+app.use("/api/v1/posts", posts);
+app.use("/api/v1/messages", messages);
+app.use("/api/v1/comments", comments);
 
 app.use(errorHandler);
 
@@ -91,7 +89,7 @@ const server = app.listen(
 );
 
 // Handle unhandled promise rejections
-process.on('unhandledRejection', (err, promise) => {
+process.on("unhandledRejection", (err, promise) => {
   console.log(`Error: ${err.message}`.red);
   // Close server & exit process
   // server.close(() => process.exit(1));
